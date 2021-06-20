@@ -48,7 +48,7 @@ class ScanResultAdapter(
             rowScanResultBinding.deviceName.text = result.device.name ?: "Unnamed"
             rowScanResultBinding.macAddress.text = result.device.address
             rowScanResultBinding.signalStrength.text = "${result.rssi} dBm"
-//            rowScanResultBinding.setOnClickListener { onClickListener.invoke(result) }
+            rowScanResultBinding.root.setOnClickListener { onClickListener.invoke(result) }
         }
     }
 }
