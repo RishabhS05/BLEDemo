@@ -9,6 +9,7 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -19,8 +20,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.example.bleexampleapp.bledevice.BleOperationsActivity
 import com.example.bleexampleapp.databinding.ActivityMainBinding
 import com.example.bleexampleapp.utils.DebugLog
+
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -47,8 +50,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        ConnectionManager.registerListener(connectionEventListener)
         if(!isLocationPermissionGranted)
             askLocationPermission.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+//        locationTurnOnCheck();
         if(!bluetoothAdapter.isEnabled) {
             promptEnableBluetooth()
         }
@@ -154,6 +159,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun locationTurnOnCheck() {
+        val manager = getSystemService(LOCATION_SERVICE) as LocationManager
+        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//            val enableBtIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+//            resultLauncher.launch(enableBtIntent)
+        }
+    }
+
+    private val connectionEventListener by lazy {
+        ConnectionEventListener().apply {
+            onConnectionSetupComplete = { gatt ->
+                Intent(this@MainActivity, BleOperationsActivity::class.java).also {
+                    it.putExtra(BluetoothDevice.EXTRA_DEVICE, gatt.device)
+
+                    startActivity(it)
+                }
+                ConnectionManager.unregisterListener(this)
+            }
+            onDisconnect = {
+                runOnUiThread {
+//                    alert {
+//                        title = "Disconnected"
+//                        message = "Disconnected or unable to connect to device."
+//                        positiveButton("OK") {}
+//                    }.show()
+                }
+            }
+        }
+    }
+
     private val scanResults = mutableListOf<ScanResult>()
     private val scanResultAdapter : ScanResultAdapter by lazy {
         ScanResultAdapter(scanResults) { result ->
@@ -167,4 +202,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 }
