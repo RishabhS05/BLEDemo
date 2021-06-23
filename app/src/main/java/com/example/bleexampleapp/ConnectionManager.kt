@@ -43,6 +43,16 @@ object ConnectionManager {
         )
     }
 
+    fun readBatteryLevel() {
+        val batteryServiceUuid = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
+        val batteryLevelCharUuid = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
+//        val batteryLevelChar = gatt
+//                .getService(batteryServiceUuid)?.getCharacteristic(batteryLevelCharUuid)
+//        if (batteryLevelChar?.isReadable() == true) {
+//            gatt.readCharacteristic(batteryLevelChar)
+//        }
+    }
+
     fun registerListener(listener: ConnectionEventListener) {
         if (listeners.map { it.get() }.contains(listener)) { return }
         listeners.add(WeakReference(listener))

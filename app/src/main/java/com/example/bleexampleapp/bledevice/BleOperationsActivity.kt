@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.bleexampleapp.*
 import com.example.bleexampleapp.databinding.ActivityBleOperationsBinding
+import com.example.bleexampleapp.utils.DebugLog
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -77,16 +78,25 @@ class BleOperationsActivity : AppCompatActivity() {
             title = device.name
         }
         setupRecyclerView()
-        bleOprationsBinding.requestMtuButton.setOnClickListener {
-            if(bleOprationsBinding.mtuField.text.isNotEmpty() && bleOprationsBinding.mtuField.text.isNotBlank()) {
-                bleOprationsBinding.mtuField.text.toString().toIntOrNull()?.let { mtu ->
-                    log("Requesting for MTU value of $mtu")
-                    ConnectionManager.requestMtu(device, mtu)
-                } ?: log("Invalid MTU value: ${bleOprationsBinding.mtuField.text}")
-            } else {
-                log("Please specify a numeric value for desired ATT MTU (23-517)")
-            }
-            hideKeyboard()
+        bleOprationsBinding.batteryLevelButton.setOnClickListener {
+//            val batteryServiceUuid = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
+            val batteryLevelCharUuid = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
+            var gatt = characteristics.firstOrNull { it.uuid == batteryLevelCharUuid }
+            ConnectionManager.readCharacteristic(device, gatt!!)
+//            val bttlevel = gatt.value.toHexString()
+//            runOnUiThread {
+//                Toast.makeText(this, "Battery Level ${bttlevel}", Toast.LENGTH_LONG).show()
+////                bleOprationsBinding.batteryLevelIndicator.text = gatt!!.value.toHexString()
+//            }
+//            if(bleOprationsBinding.mtuField.text.isNotEmpty() && bleOprationsBinding.mtuField.text.isNotBlank()) {
+//                bleOprationsBinding.mtuField.text.toString().toIntOrNull()?.let { mtu ->
+//                 log("Requesting for MTU value of $mtu")
+//                    ConnectionManager.requestMtu(device, mtu)
+//                } ?: log("Invalid MTU value: ${bleOprationsBinding.batteryLevelIndicator.text}")
+//            } else {
+//                log("Please specify a numeric value for desired ATT MTU (23-517)")C
+//            }
+//            hideKeyboard()
         }
     }
 
@@ -124,16 +134,16 @@ class BleOperationsActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun log(message : String) {
-        val formattedMessage = String.format("%s: %s", dateFormatter.format(Date()), message)
-        runOnUiThread {
-            val currentLogText = if(bleOprationsBinding.logTextView.text.isEmpty()) {
-                "Beginning of log."
-            } else {
-                bleOprationsBinding.logTextView.text
-            }
-            bleOprationsBinding.logTextView.text = "$currentLogText\n$formattedMessage"
-            bleOprationsBinding.logScrollView.post { bleOprationsBinding.logScrollView.fullScroll(View.FOCUS_DOWN) }
-        }
+//        val formattedMessage = String.format("%s: %s", dateFormatter.format(Date()), message)
+//        runOnUiThread {
+//            val currentLogText = if(bleOprationsBinding.logTextView.text.isEmpty()) {
+//                "Beginning of log."
+//            } else {
+//                bleOprationsBinding.logTextView.text
+//            }
+//            bleOprationsBinding.logTextView.text = "$currentLogText\n$formattedMessage"
+//            bleOprationsBinding.logScrollView.post { bleOprationsBinding.logScrollView.fullScroll(View.FOCUS_DOWN) }
+//        }
     }
 
     private fun showCharacteristicOptions(characteristic : BluetoothGattCharacteristic) {
@@ -196,7 +206,10 @@ class BleOperationsActivity : AppCompatActivity() {
             }
 
             onCharacteristicRead = { _, characteristic ->
-                log("Read from ${characteristic.uuid}: ${characteristic.value.toHexString()}")
+                DebugLog.d(" CEL Read from ${characteristic.uuid}: ${characteristic.value.toHexString()}")
+                runOnUiThread {
+                    bleOprationsBinding.batteryLevelIndicator.text = characteristic.value.first().toInt().toString()
+                }
             }
 
             onCharacteristicWrite = { _, characteristic ->
