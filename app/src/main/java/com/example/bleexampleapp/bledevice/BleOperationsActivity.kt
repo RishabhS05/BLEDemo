@@ -208,7 +208,7 @@ class BleOperationsActivity : AppCompatActivity() {
             onCharacteristicRead = { _, characteristic ->
                 DebugLog.d(" CEL Read from ${characteristic.uuid}: ${characteristic.value.toHexString()}")
                 runOnUiThread {
-                    bleOprationsBinding.batteryLevelIndicator.text = characteristic.value.first().toInt().toString()
+                    bleOprationsBinding.batteryLevelIndicator.text = "${characteristic.value.first().toInt().toString()}%"
                 }
             }
 

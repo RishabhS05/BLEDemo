@@ -9,7 +9,6 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -23,11 +22,14 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.bleexampleapp.bledevice.BleOperationsActivity
 import com.example.bleexampleapp.databinding.ActivityMainBinding
 import com.example.bleexampleapp.utils.DebugLog
-
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.*
+import com.google.android.gms.tasks.Task
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    val REQUEST_CHECK_SETTING = 1001
     lateinit var mainActivityBinding : ActivityMainBinding
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         ConnectionManager.registerListener(connectionEventListener)
         if(!isLocationPermissionGranted)
             askLocationPermission.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-//        locationTurnOnCheck();
+        createLocationRequest()
         if(!bluetoothAdapter.isEnabled) {
             promptEnableBluetooth()
         }
@@ -159,11 +161,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun locationTurnOnCheck() {
-        val manager = getSystemService(LOCATION_SERVICE) as LocationManager
-        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            val enableBtIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-//            resultLauncher.launch(enableBtIntent)
+    fun createLocationRequest() {
+        val locationRequest = LocationRequest.create()?.apply {
+            interval = 200000
+            fastestInterval = 100000
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        builder.setAlwaysShow(true)
+        builder.setNeedBle(true)
+        val client : SettingsClient = LocationServices.getSettingsClient(this)
+        val task : Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+        task.addOnSuccessListener { locationSettingsResponse ->
+        }.addOnFailureListener { exception ->
+            if(exception is ResolvableApiException) {
+                exception.startResolutionForResult(this@MainActivity, REQUEST_CHECK_SETTING)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_CHECK_SETTING) {
+            when(resultCode) {
+                Activity.RESULT_OK ->
+                    Toast.makeText(this@MainActivity, "GPS is turned on ", Toast.LENGTH_SHORT).show()
+                Activity.RESULT_CANCELED -> Toast.makeText(this@MainActivity, "GPS is required to be turned on!!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -188,7 +212,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private val scanResults = mutableListOf<ScanResult>()
     private val scanResultAdapter : ScanResultAdapter by lazy {
         ScanResultAdapter(scanResults) { result ->
@@ -202,5 +225,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 }
