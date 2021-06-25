@@ -1,19 +1,3 @@
-/*
- * Copyright 2019 Punch Through Design LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.bleexampleapp.bledevice
 
 import android.annotation.SuppressLint
@@ -33,6 +17,10 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.bleexampleapp.*
 import com.example.bleexampleapp.databinding.ActivityBleOperationsBinding
 import com.example.bleexampleapp.utils.DebugLog
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.selector
+import org.jetbrains.anko.yesButton
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -148,48 +136,48 @@ class BleOperationsActivity : AppCompatActivity() {
 
     private fun showCharacteristicOptions(characteristic : BluetoothGattCharacteristic) {
         characteristicProperties[characteristic]?.let { properties ->
-//            selector("Select an action to perform", properties.map { it.action }) { _, i ->
-//                when(properties[i]) {
-//                    CharacteristicProperty.Readable -> {
-//                        log("Reading from ${characteristic.uuid}")
-//                        ConnectionManager.readCharacteristic(device, characteristic)
-//                    }
-//                    CharacteristicProperty.Writable, CharacteristicProperty.WritableWithoutResponse -> {
-//                        showWritePayloadDialog(characteristic)
-//                    }
-//                    CharacteristicProperty.Notifiable, CharacteristicProperty.Indicatable -> {
-//                        if(notifyingCharacteristics.contains(characteristic.uuid)) {
-//                            log("Disabling notifications on ${characteristic.uuid}")
-//                            ConnectionManager.disableNotifications(device, characteristic)
-//                        } else {
-//                            log("Enabling notifications on ${characteristic.uuid}")
-//                            ConnectionManager.enableNotifications(device, characteristic)
-//                        }
-//                    }
-//                }
-//            }
+            selector("Select an action to perform", properties.map { it.action }) { _, i ->
+                when(properties[i]) {
+                    CharacteristicProperty.Readable -> {
+                        log("Reading from ${characteristic.uuid}")
+                        ConnectionManager.readCharacteristic(device, characteristic)
+                    }
+                    CharacteristicProperty.Writable, CharacteristicProperty.WritableWithoutResponse -> {
+                        showWritePayloadDialog(characteristic)
+                    }
+                    CharacteristicProperty.Notifiable, CharacteristicProperty.Indicatable -> {
+                        if(notifyingCharacteristics.contains(characteristic.uuid)) {
+                            log("Disabling notifications on ${characteristic.uuid}")
+                            ConnectionManager.disableNotifications(device, characteristic)
+                        } else {
+                            log("Enabling notifications on ${characteristic.uuid}")
+                            ConnectionManager.enableNotifications(device, characteristic)
+                        }
+                    }
+                }
+            }
         }
     }
 
     @SuppressLint("InflateParams")
     private fun showWritePayloadDialog(characteristic : BluetoothGattCharacteristic) {
         val hexField = layoutInflater.inflate(R.layout.edittext_hex_payload, null) as EditText
-//        alert {
-//            customView = hexField
-//            isCancelable = false
-//            yesButton {
-//                with(hexField.text.toString()) {
-//                    if(isNotBlank() && isNotEmpty()) {
-//                        val bytes = hexToBytes()
-//                        log("Writing to ${characteristic.uuid}: ${bytes.toHexString()}")
-//                        ConnectionManager.writeCharacteristic(device, characteristic, bytes)
-//                    } else {
-//                        log("Please enter a hex payload to write to ${characteristic.uuid}")
-//                    }
-//                }
-//            }
-//            noButton {}
-//        }.show()
+        alert {
+            customView = hexField
+            isCancelable = false
+            yesButton {
+                with(hexField.text.toString()) {
+                    if(isNotBlank() && isNotEmpty()) {
+                        val bytes = hexToBytes()
+                        log("Writing to ${characteristic.uuid}: ${bytes.toHexString()}")
+                        ConnectionManager.writeCharacteristic(device, characteristic, bytes)
+                    } else {
+                        log("Please enter a hex payload to write to ${characteristic.uuid}")
+                    }
+                }
+            }
+            noButton {}
+        }.show()
         hexField.showKeyboard()
     }
 
@@ -197,18 +185,22 @@ class BleOperationsActivity : AppCompatActivity() {
         ConnectionEventListener().apply {
             onDisconnect = {
                 runOnUiThread {
-//                    alert {
-//                        title = "Disconnected"
-//                        message = "Disconnected from device."
-//                        positiveButton("OK") { onBackPressed() }
-//                    }.show()
+                    alert {
+                        title = "Disconnected"
+                        message = "Disconnected from device."
+                        positiveButton("OK") { onBackPressed() }
+                    }.show()
                 }
             }
 
             onCharacteristicRead = { _, characteristic ->
                 DebugLog.d(" CEL Read from ${characteristic.uuid}: ${characteristic.value.toHexString()}")
                 runOnUiThread {
-                    bleOprationsBinding.batteryLevelIndicator.text = "${characteristic.value.first().toInt().toString()}%"
+                    if(characteristic.uuid.toString() == SampleGattAttribute.BATTERY_CLIENT_UUID)
+                        bleOprationsBinding.batteryLevelIndicator.text = "${characteristic.value.first().toInt().toString()}%"
+                    else {
+                        bleOprationsBinding.outputScreen.text = "${characteristic.value.decodeToString()}"
+                    }
                 }
             }
 
@@ -269,4 +261,6 @@ class BleOperationsActivity : AppCompatActivity() {
     }
 
     private fun String.hexToBytes() = this.chunked(2).map { it.toUpperCase(Locale.US).toInt(16).toByte() }.toByteArray()
+
+
 }

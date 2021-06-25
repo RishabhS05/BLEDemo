@@ -1,11 +1,10 @@
-
-
 package com.example.bleexampleapp.bledevice
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bleexampleapp.SampleGattAttribute
 import com.example.bleexampleapp.databinding.RowCharacteristicBinding
 import com.example.bleexampleapp.printProperties
 
@@ -31,6 +30,7 @@ class CharacteristicAdapter(
     ) : RecyclerView.ViewHolder(view.root) {
 
         fun bind(characteristic : BluetoothGattCharacteristic) {
+            view.characterisricsName.text = SampleGattAttribute.lookup(characteristic.uuid.toString(), "Unknown")
             view.characteristicUuid.text = characteristic.uuid.toString()
             view.characteristicProperties.text = characteristic.printProperties()
             view.root.setOnClickListener { onClickListener.invoke(characteristic) }
