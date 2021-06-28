@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,28 +9,82 @@
     tools:context=".bledevice.BleOperationsActivity">
 
 
-    <TextView
-        android:id="@+id/characteristics_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:text="Characteristics"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <LinearLayout
-
-        app:layout_constraintTop_toBottomOf="@id/characteristics_title"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp">
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/characteristics_title">
 
+        <LinearLayout
+            android:id="@+id/battery_level_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/characteristics_title"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/battery_level_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Check battery Level" />
+
+            <TextView
+                android:id="@+id/battery_level_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:importantForAutofill="no"
+                android:text="0"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/log_title"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginTop="16dp"-->
+        <!--            android:layout_marginStart="16dp"-->
+        <!--            android:text="Log"-->
+        <!--            android:textStyle="bold"-->
+        <!--            android:textSize="16sp" />-->
+
+        <!--        <ScrollView-->
+        <!--            android:id="@+id/log_scroll_view"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="0dp"-->
+        <!--            android:layout_weight="1"-->
+        <!--            android:padding="4dp">-->
+
+        <!--            <TextView-->
+        <!--                android:id="@+id/log_text_view"-->
+        <!--                android:scrollbars="vertical"-->
+        <!--                android:gravity="bottom"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content" />-->
+
+        <!--        </ScrollView>-->
+        <TextView
+            android:id="@+id/characteristics_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Characteristics"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/characteristics_recycler_view"
             android:layout_width="match_parent"
@@ -41,62 +94,28 @@
             android:scrollbars="vertical"
             tools:listitem="@layout/row_characteristic" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/log_title"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:text="Log"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textSize="16sp" />-->
-
-<!--        <ScrollView-->
-<!--            android:id="@+id/log_scroll_view"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="0dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:padding="4dp">-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/log_text_view"-->
-<!--                android:scrollbars="vertical"-->
-<!--                android:gravity="bottom"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content" />-->
-
-<!--        </ScrollView>-->
-        <LinearLayout
-            android:id="@+id/battery_level_container"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:orientation="horizontal"
-            android:layout_weight="1"
+        <TextView
             android:layout_width="match_parent"
-            app:layout_constraintTop_toBottomOf="@id/characteristics_title"
-            android:layout_height="wrap_content">
-            <Button
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
 
-                android:id="@+id/battery_level_button"
-                android:text="Check battery Level"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:layout_weight="1"
-                android:layout_marginLeft="20dp"
-                android:textSize="20sp"
-                android:textAlignment="center"
-                android:id="@+id/battery_level_indicator"
-                android:text="0"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:importantForAutofill="no" />
-
-        </LinearLayout>
-
+            android:text="Output For read"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/output_screen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

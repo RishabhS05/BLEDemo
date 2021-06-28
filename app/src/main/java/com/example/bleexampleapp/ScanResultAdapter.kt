@@ -43,7 +43,6 @@ class ScanResultAdapter(
             private val rowScanResultBinding : RowScanResultBinding,
             private val onClickListener : ((device : ScanResult) -> Unit)
     ) : RecyclerView.ViewHolder(rowScanResultBinding.root) {
-
         fun bind(result : ScanResult) {
             rowScanResultBinding.deviceName.text = result.device.name ?: "Unnamed"
             rowScanResultBinding.macAddress.text = result.device.address

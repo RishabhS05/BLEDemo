@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
         mainActivityBinding = ActivityMainBinding.inflate(layoutInflater)
+        SampleGattAttribute.getValues()
         setContentView(mainActivityBinding.root)
         mainActivityBinding.scanNow.setOnClickListener {
             if(isScanning) stopBleScan() else startBleScan()
