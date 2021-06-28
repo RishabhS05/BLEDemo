@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -67,10 +68,12 @@ class BleOperationsActivity : AppCompatActivity() {
         }
         setupRecyclerView()
         bleOprationsBinding.batteryLevelButton.setOnClickListener {
-//            val batteryServiceUuid = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
+            val batteryServiceUuid = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
             val batteryLevelCharUuid = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
             var gatt = characteristics.firstOrNull { it.uuid == batteryLevelCharUuid }
-            ConnectionManager.readCharacteristic(device, gatt!!)
+            if(gatt != null)
+                ConnectionManager.readCharacteristic(device, gatt)
+            else Toast.makeText(this@BleOperationsActivity, "Something went wrong!!", Toast.LENGTH_SHORT).show()
 //            val bttlevel = gatt.value.toHexString()
 //            runOnUiThread {
 //                Toast.makeText(this, "Battery Level ${bttlevel}", Toast.LENGTH_LONG).show()
@@ -261,6 +264,4 @@ class BleOperationsActivity : AppCompatActivity() {
     }
 
     private fun String.hexToBytes() = this.chunked(2).map { it.toUpperCase(Locale.US).toInt(16).toByte() }.toByteArray()
-
-
 }
